@@ -47,6 +47,13 @@
     background: #2e9c4a; border-radius: 50%; margin-right: 5px;
   }
 
+  /* FAIXA DO SITE */
+  .site-banner {
+    background: var(--vinho); color: #fff; text-align: center;
+    font-size: 12px; padding: 8px 12px; line-height: 1.4;
+  }
+  .site-banner a { color: var(--amarelo); font-weight: bold; text-decoration: underline; }
+
   /* MENSAGENS */
   .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: var(--creme); }
   .message { display: flex; margin-bottom: 14px; }
@@ -119,6 +126,11 @@
     </div>
   </div>
 
+  <div class="site-banner">
+    🌐 A experiência é bem melhor no nosso site:
+    <a href="https://theskibideria.lovable.app" target="_blank" rel="noopener">theskibideria.lovable.app</a>
+  </div>
+
   <div class="chat-messages" id="chatMessages"></div>
 
   <div class="typing" id="typing">🍔 Atendente está digitando...</div>
@@ -136,35 +148,182 @@
 </div>
 
 <script>
-  const CARDAPIO = 'https://ibb.co/23XXKHxJ';
-  const link = `<a href="${CARDAPIO}" target="_blank" rel="noopener">${CARDAPIO}</a>`;
+  const SITE_URL = 'https://theskibideria.lovable.app';
+  const link = `<a href="${SITE_URL}" target="_blank" rel="noopener">theskibideria.lovable.app</a>`;
 
-  // Respostas de cada área de atendimento
+  // ---------------------------------------------------------------
+  // RESPOSTAS
+  // ---------------------------------------------------------------
+  const saudacoes = [
+    'Olá, como posso ajudar?? 😊',
+    'Opa, seja bem-vindo(a)! 🍔 Como posso ajudar?',
+    'E aí! 👋 Bateu a fome? Me conta o que você precisa!',
+    'Fala aí! 😄 Em que posso ajudar?'
+  ];
+  const sorteia = lista => lista[Math.floor(Math.random() * lista.length)];
+
   const respostas = {
-    saudacao:   'Olá, como posso ajudar?? 😊',
-    endereco:   '📍 <strong>Endereço</strong><br><br>Rua Belterra 291 - Santo Amaro SP',
-    entrega:    '🛵 <strong>Entrega</strong><br><br>Entregamos por toda a cidade com uma taxa de R$7,00',
-    feedback:   '⭐ <strong>Feedback</strong><br><br>Agradecemos!! Estamos disponíveis para sua próxima compra!',
-    finalizacao:'👋 Agradecemos pelo contato!! Volte sempre',
-    horario:    '🕕 <strong>Horário</strong><br><br>Trabalhamos das 18h às 23:00',
-    pagamento:  '💳 <strong>Pagamento</strong><br><br>Aceitamos cartão de débito e crédito e pix!!',
-    precos:     `💰 <strong>Preços</strong><br><br>Consulte nossos preços nesse cardápio:<br>${link}`,
-    produtos:   `🍔 <strong>Produtos</strong><br><br>Consulte os produtos nesse cardápio:<br>${link}`,
-    padrao:     '🤖 Não entendi muito bem essa pergunta.<br><br>Você pode perguntar sobre <strong>produtos, preços, entrega, pagamento, horário ou endereço</strong>.'
+    saudacao:   () => sorteia(saudacoes),
+    tudobem:    () => 'Tudo ótimo por aqui, obrigado por perguntar! 😄 E você? Como posso ajudar?',
+    quem:       () => '🤖 Eu sou o assistente virtual da <strong>The Skibideria</strong>! Respondo na hora sobre produtos, preços, entrega, pagamento, horário e endereço.',
+    ajuda:      () => '🙋 Claro, estou aqui pra ajudar!<br><br>Você pode me perguntar sobre <strong>produtos, preços, entrega, pagamento, horário ou endereço</strong>, ou usar os botões aqui embaixo.',
+    endereco:   () => '📍 <strong>Endereço</strong><br><br>Rua Belterra 291 - Santo Amaro SP',
+    entrega:    () => '🛵 <strong>Entrega</strong><br><br>Entregamos por toda a cidade com uma taxa de R$7,00',
+    feedback:   () => '⭐ <strong>Feedback</strong><br><br>Agradecemos!! Estamos disponíveis para sua próxima compra!',
+    finalizacao:() => '👋 Agradecemos pelo contato!! Volte sempre',
+    horario:    () => '🕕 <strong>Horário</strong><br><br>Trabalhamos das 18h às 23:00',
+    pagamento:  () => '💳 <strong>Pagamento</strong><br><br>Aceitamos cartão de débito e crédito e pix!!',
+    precos:     () => `💰 <strong>Preços</strong><br><br>Confira todos os preços no nosso site:<br>${link}<br><br>Lá a experiência é bem melhor: dá pra ver tudo com calma e escolher o que mais combina com a sua fome 😋`,
+    produtos:   () => `🍔 <strong>Produtos</strong><br><br>Veja todos os nossos produtos no site:<br>${link}<br><br>Lá a experiência é bem melhor, com o cardápio completo e mais fácil de navegar 😉`,
+    pedido:     () => `🛒 <strong>Pedidos</strong><br><br>Dê uma olhada no cardápio completo no nosso site e escolha o que mais bater com a sua fome:<br>${link}`,
+    promocoes:  () => `🎉 <strong>Promoções</strong><br><br>Fique de olho nas novidades e promoções no nosso site:<br>${link}`,
+    site:       () => `🌐 <strong>Nosso site</strong><br><br>${link}<br><br>Lá a experiência é bem melhor: você vê o cardápio completo, os preços e conhece mais da The Skibideria. Vale a visita! 🍔`,
+    padrao:     () => '🤖 Não entendi muito bem essa pergunta.<br><br>Você pode perguntar sobre <strong>produtos, preços, entrega, pagamento, horário ou endereço</strong>.<br><br>Se preferir, veja tudo no nosso site: ' + link
   };
 
-  // Palavras-chave (sem acento, minúsculas). Ordem = prioridade.
-  const intencoes = [
-    ['finalizacao', ['tchau', 'ate mais', 'ate logo', 'obrigado', 'obrigada', 'valeu', 'finalizar', 'encerrar', 'era isso', 'so isso']],
-    ['feedback',    ['feedback', 'avaliar', 'avaliacao', 'elogio', 'reclamacao', 'sugestao', 'opiniao', 'gostei', 'adorei']],
-    ['entrega',     ['entrega', 'entregam', 'entregar', 'delivery', 'taxa', 'frete', 'motoboy']],
-    ['pagamento',   ['pagamento', 'pagar', 'pix', 'cartao', 'credito', 'debito', 'dinheiro', 'forma de pag']],
-    ['horario',     ['horario', 'hora', 'abre', 'aberto', 'fecha', 'funcionamento', 'funciona']],
-    ['endereco',    ['endereco', 'localizacao', 'onde fica', 'onde voces', 'local', 'como chegar', 'rua']],
-    ['precos',      ['preco', 'precos', 'valor', 'valores', 'quanto custa', 'quanto e', 'quanto fica']],
-    ['produtos',    ['produto', 'produtos', 'cardapio', 'menu', 'hamburguer', 'hamburger', 'burger', 'lanche', 'combo', 'batata', 'bebida']],
-    ['saudacao',    ['oi', 'ola', 'bom dia', 'boa tarde', 'boa noite', 'e ai', 'eai', 'hello', 'hey']]
+  // ---------------------------------------------------------------
+  // INTENTS (palavras-chave; a ordem define a prioridade em empates)
+  // Não precisa se preocupar com acento, maiúscula ou letras repetidas
+  // ("oiii", "Olááá" e "oi" são tratados igual).
+  // ---------------------------------------------------------------
+  const intencoesBrutas = [
+    ['feedback', [
+      'feedback', 'avaliar', 'avaliacao', 'avaliar o atendimento', 'elogio', 'elogiar', 'reclamacao', 'reclamar',
+      'sugestao', 'sugerir', 'opiniao', 'critica', 'gostei', 'adorei', 'amei', 'curti', 'delicia', 'delicioso',
+      'maravilhoso', 'show de bola', 'nota 10', 'comentario', 'deixar um recado', 'queria elogiar', 'queria reclamar',
+      'pessimo', 'horrivel', 'demorou', 'atrasou', 'chegou frio', 'nao gostei', 'muito bom', 'estava bom', 'estava otimo'
+    ]],
+    ['entrega', [
+      'entrega', 'entregam', 'entregar', 'entregas', 'entregador', 'delivery', 'taxa', 'taxa de entrega', 'frete',
+      'motoboy', 'moto boy', 'leva ate', 'levam', 'levar em casa', 'traz em casa', 'trazem', 'ate minha casa',
+      'na minha casa', 'meu bairro', 'minha regiao', 'regiao', 'bairro', 'atendem', 'atende minha', 'cobram entrega',
+      'cobra entrega', 'entrega gratis', 'frete gratis', 'entrega em casa', 'vao ate', 'chega ate', 'cidade',
+      'quanto custa a entrega', 'quanto e a entrega', 'valor da entrega', 'tem entrega', 'fazem entrega', 'faz entrega',
+      'delivery tem', 'pedir em casa', 'receber em casa'
+    ]],
+    ['pagamento', [
+      'pagamento', 'pagamentos', 'pagar', 'pagando', 'pago', 'pix', 'cartao', 'cartoes', 'credito', 'debito',
+      'dinheiro', 'especie', 'forma de pagamento', 'formas de pagamento', 'forma de pag', 'como pagar',
+      'aceitam', 'aceita', 'aceitam cartao', 'aceita cartao', 'aceita pix', 'aceitam pix', 'maquininha', 'maquina',
+      'troco', 'vale refeicao', 'vale alimentacao', 'ticket', 'vr', 'visa', 'master', 'mastercard', 'elo',
+      'chave pix', 'transferencia', 'parcelar', 'parcela', 'parcelado', 'a vista', 'na entrega', 'pago na entrega',
+      'pagar na entrega', 'qr code'
+    ]],
+    ['horario', [
+      'horario', 'horarios', 'hora', 'horas', 'abre', 'abrem', 'abriu', 'aberto', 'aberta', 'abertos', 'fecha',
+      'fecham', 'fechado', 'fechada', 'funcionamento', 'funciona', 'funcionam', 'que horas', 'ate que horas',
+      'a partir de que horas', 'quando abre', 'quando fecha', 'dias da semana', 'domingo', 'sabado', 'segunda',
+      'terca', 'quarta', 'quinta', 'sexta', 'feriado', 'feriados', 'final de semana', 'fim de semana', 'fds',
+      'tarde da noite', 'de noite', 'jantar', 'ainda esta aberto', 'ainda ta aberto', 'esta aberto', 'ta aberto',
+      'abertura', 'expediente', 'atendimento ate', 'ate quando'
+    ]],
+    ['endereco', [
+      'endereco', 'enderecos', 'localizacao', 'localizar', 'localizado', 'onde fica', 'onde ficam', 'onde voces',
+      'onde e', 'onde esta', 'onde estao', 'local', 'como chegar', 'rua', 'avenida', 'bairro de voces', 'mapa',
+      'maps', 'google maps', 'waze', 'gps', 'referencia', 'ponto de referencia', 'perto de', 'proximo de',
+      'santo amaro', 'loja fisica', 'presencial', 'ir ai', 'ir ate ai', 'ir ai comer', 'comer ai', 'comer no local',
+      'tem mesa', 'tem lugar', 'tem salao', 'sede', 'unidade', 'filial', 'estabelecimento', 'passar ai', 'visitar'
+    ]],
+    ['precos', [
+      'preco', 'precos', 'valor', 'valores', 'quanto custa', 'quanto custam', 'quanto e', 'quanto fica',
+      'quanto sai', 'quanto cobra', 'quanto cobram', 'quanto vale', 'quanto ta', 'quanto esta', 'custa', 'custam',
+      'custo', 'caro', 'barato', 'baratinho', 'em conta', 'preco do', 'preco da', 'tabela de precos', 'valor do',
+      'valor da', 'a partir de', 'reais', 'r$', 'orcamento', 'cabe no bolso', 'mais em conta', 'o mais barato',
+      'mais barato', 'mais caro', 'pelo preco', 'qual o preco', 'qual o valor', 'quais os precos', 'quais os valores'
+    ]],
+    ['promocoes', [
+      'promocao', 'promocoes', 'promo', 'desconto', 'descontos', 'oferta', 'ofertas', 'cupom', 'cupons', 'cashback',
+      'brinde', 'brindes', 'leve 2', 'pague 1', 'oferta do dia', 'promocao do dia', 'dia de promocao', 'novidade',
+      'novidades', 'lancamento', 'lancamentos', 'fidelidade', 'tem promocao', 'tem desconto', 'combo promocional',
+      'happy hour', 'terca em dobro', 'em dobro'
+    ]],
+    ['pedido', [
+      'pedido', 'pedidos', 'pedir', 'fazer pedido', 'fazer um pedido', 'quero pedir', 'quero fazer', 'quero comprar',
+      'comprar', 'encomendar', 'encomenda', 'reservar', 'reserva', 'anotar', 'anota ai', 'anotar pedido', 'queria pedir',
+      'quero um', 'quero uma', 'quero dois', 'me ve', 'me manda', 'manda um', 'manda uma', 'vou querer', 'vou pedir',
+      'como pedir', 'como faco pedido', 'como faco para pedir', 'como compro', 'como comprar', 'bora pedir',
+      'to com fome', 'estou com fome', 'fome', 'bateu a fome', 'matar a fome', 'quero comer', 'queria comer',
+      'cancelar pedido', 'meu pedido', 'status do pedido', 'onde esta meu pedido', 'acompanhar pedido'
+    ]],
+    ['produtos', [
+      'produto', 'produtos', 'cardapio', 'cardapios', 'menu', 'carta', 'opcoes', 'opcao', 'sabores', 'sabor',
+      'hamburguer', 'hamburgueres', 'hamburger', 'hamburgers', 'hambuguer', 'burger', 'burgers', 'burguer',
+      'x burguer', 'x salada', 'x bacon', 'x tudo', 'x egg', 'xis', 'lanche', 'lanches', 'sanduiche', 'sanduiches',
+      'combo', 'combos', 'batata', 'batatas', 'batata frita', 'fritas', 'porcao', 'porcoes', 'onion rings', 'nuggets',
+      'bebida', 'bebidas', 'refrigerante', 'refri', 'coca', 'coca cola', 'guarana', 'suco', 'cerveja', 'agua',
+      'milkshake', 'shake', 'sobremesa', 'sobremesas', 'doce', 'sorvete', 'molho', 'molhos', 'adicional', 'adicionais',
+      'bacon', 'queijo', 'cheddar', 'carne', 'frango', 'vegetariano', 'vegano', 'vegetariana', 'vegana', 'sem carne',
+      'o que tem', 'o que voces tem', 'o que vende', 'o que voces vendem', 'o que tem de bom', 'o que servem',
+      'tem hamburguer', 'tem lanche', 'tem batata', 'tem refrigerante', 'tem bebida', 'tem combo', 'tem sobremesa',
+      'sugestao de lanche', 'qual o melhor', 'mais pedido', 'mais vendido', 'especialidade', 'especialidade da casa',
+      'carro chefe', 'artesanal', 'gourmet', 'ingredientes', 'ingrediente', 'tamanho', 'gramas', 'blend', 'pao',
+      'sem cebola', 'sem tomate', 'sem gluten', 'sem lactose', 'alergia', 'alergico', 'infantil', 'kids', 'crianca',
+      'fotos', 'foto do lanche', 'ver o cardapio', 'manda o cardapio', 'me passa o cardapio', 'quero ver o cardapio'
+    ]],
+    ['site', [
+      'site', 'sites', 'website', 'pagina', 'link', 'links', 'online', 'on line', 'internet', 'app', 'aplicativo',
+      'instagram', 'insta', 'redes sociais', 'rede social', 'facebook', 'tiktok', 'whatsapp', 'zap', 'whats',
+      'contato', 'contatos', 'telefone', 'fone', 'ligar', 'email', 'e-mail', 'url', 'endereco do site',
+      'site de voces', 'tem site', 'tem app', 'tem instagram', 'tem whatsapp', 'qual o site', 'qual o link',
+      'manda o link', 'me manda o link', 'mande o link', 'link do site', 'onde pedir online'
+    ]],
+    ['quem', [
+      'quem e voce', 'quem e vc', 'quem voce e', 'quem fala', 'voce e um robo', 'voce e robo', 'e robo',
+      'e um robo', 'e bot', 'voce e bot', 'e humano', 'voce e humano', 'pessoa de verdade', 'atendente humano',
+      'falar com atendente', 'falar com alguem', 'falar com uma pessoa', 'falar com humano', 'tem alguem ai',
+      'tem alguem', 'chatbot', 'bot', 'robo', 'inteligencia artificial', 'assistente', 'seu nome',
+      'qual seu nome', 'qual o seu nome', 'como voce se chama', 'como se chama', 'dono', 'gerente', 'responsavel',
+      'o que voce faz', 'o que voce sabe', 'o que voce pode fazer', 'o que vc faz'
+    ]],
+    ['ajuda', [
+      'ajuda', 'ajudar', 'ajudam', 'me ajuda', 'preciso de ajuda', 'pode ajudar', 'podem ajudar', 'socorro',
+      'duvida', 'duvidas', 'tenho uma duvida', 'tenho uma pergunta', 'pergunta', 'perguntar', 'queria saber',
+      'quero saber', 'gostaria de saber', 'gostaria de uma informacao', 'informacao', 'informacoes', 'info',
+      'infos', 'preciso de uma informacao', 'saber mais', 'me explica', 'como funciona', 'nao sei', 'nao sei o que pedir',
+      'opcoes de atendimento', 'o que posso perguntar', 'comandos', 'como usar', 'menu de opcoes', 'ver opcoes',
+      'preciso falar', 'queria falar', 'posso perguntar', 'posso falar', 'posso tirar uma duvida'
+    ]],
+    ['finalizacao', [
+      'tchau', 'xau', 'chau', 'tchauzinho', 'ate mais', 'ate logo', 'ate amanha', 'ate a proxima', 'ate breve',
+      'flw', 'falou', 'fui', 'to indo', 'estou indo', 'vou nessa', 'vou indo', 'abraco', 'abracos',
+      'valeu', 'vlw', 'valeu mesmo', 'obrigado', 'obrigada', 'obrigadao', 'obg', 'brigado', 'brigada', 'agradeco',
+      'agradecido', 'agradecida', 'muito obrigado', 'muito obrigada', 'grato', 'grata', 'gratidao', 'thanks',
+      'thank you', 'finalizar', 'finalizado', 'finalizacao', 'encerrar', 'encerrado', 'encerra', 'terminar',
+      'terminei', 'era isso', 'e isso', 'so isso', 'so isso mesmo', 'era so isso', 'e so isso', 'por hoje e so',
+      'por enquanto e so', 'nada mais', 'mais nada', 'ja resolvi', 'ja ajudou', 'resolvido', 'tudo certo entao',
+      'combinado', 'fechado entao', 'beleza entao', 'blz entao', 'perfeito obrigado', 'ok obrigado', 'bye',
+      'adeus', 'boa noite pra voces', 'bom descanso', 'tenha um bom dia', 'ate a proxima vez'
+    ]],
+    ['tudobem', [
+      'tudo bem', 'tudo bom', 'td bem', 'td bom', 'tudo certo', 'tudo joia', 'tudo tranquilo', 'tudo em paz',
+      'como vai', 'como voce esta', 'como vc esta', 'como vc ta', 'como voce ta', 'como esta', 'como ta',
+      'como estao', 'como andam', 'de boa', 'ta bem', 'esta bem', 'tudo na paz', 'beleza', 'blz', 'suave',
+      'tranquilo', 'tranquila', 'como vai voce', 'como vai vc', 'e voce', 'e vc', 'e voces', 'novidades por ai',
+      'tudo em cima', 'firmeza', 'sussa', 'susse', 'na paz', 'joia'
+    ]],
+    ['saudacao', [
+      'oi', 'oie', 'oii', 'oiee', 'oiie', 'oie', 'ola', 'olaa', 'olar', 'olah', 'opa', 'opaa', 'opaaa', 'opaa tudo',
+      'salve', 'salve salve', 'salvee', 'eai', 'e ai', 'e a i', 'eaew', 'eae', 'eaee', 'iae', 'iai', 'ia e',
+      'fala', 'fala ai', 'fala ae', 'fala ae mano', 'fala galera', 'fala pessoal', 'fala man', 'fala mano',
+      'fala chefe', 'fala campeao', 'fala parceiro', 'fala meu', 'fala truta', 'fala tio', 'fala moco', 'e ae',
+      'e ai mano', 'e ai man', 'e ai tudo bem', 'e ai pessoal', 'e ai galera', 'coe', 'coé', 'qual e', 'qualé',
+      'hey', 'hei', 'hi', 'hello', 'helo', 'hallo', 'hola', 'alo', 'alou', 'alow', 'allo', 'yo', 'bom dia', 'bomdia',
+      'bdia', 'bodia', 'bao dia', 'boa tarde', 'boatarde', 'btarde', 'boa noite', 'boanoite', 'bnoite', 'boa madrugada',
+      'boa', 'bons dias', 'boas tardes', 'boas noites', 'bom dia pessoal', 'bom dia galera', 'boa tarde pessoal',
+      'boa noite pessoal', 'boa noite galera', 'boa tarde galera', 'saudacao', 'saudacoes', 'saudar', 'cumprimentar',
+      'comecar', 'inicio', 'iniciar', 'start', 'começar', 'eu aqui', 'cheguei', 'chegando', 'chegou', 'to aqui',
+      'estou aqui', 'tem alguem ai', 'alguem ai', 'alguem aqui', 'alguem ai ne', 'psiu', 'ei', 'eii', 'oxe', 'ola tudo bem', 'oi tudo bem', 'oi boa noite', 'oi bom dia', 'oi boa tarde', 'ola boa noite',
+      'ola bom dia', 'ola boa tarde', 'oi gente', 'oi pessoal', 'ola gente', 'ola pessoal', 'oi moca', 'oi moco',
+      'oi chefe', 'oi amigo', 'oi amiga', 'ola amigo', 'ola amiga', 
+      'fala ai pessoal', 'eaí', 'eai pessoal', 'eai galera', 'eai mano', 'eai man', 'eai tudo bem', 'eai td bem'
+    ]]
   ];
+
+  // Perguntas relacionadas a "o que já aprendeu" não entram aqui; veja detectar() abaixo.
+  const prioridade = intencoesBrutas.map(i => i[0]);
+
+  // Intents "sociais": só valem se nada mais específico for detectado
+  const SOCIAIS = ['saudacao', 'tudobem', 'finalizacao', 'ajuda'];
 
   const botoes = [
     ['Saudação', 'Olá'],
@@ -174,19 +333,90 @@
     ['Pagamento', 'Quais formas de pagamento?'],
     ['Horário', 'Qual o horário de funcionamento?'],
     ['Endereço', 'Qual o endereço?'],
+    ['Site', 'Qual o site de vocês?'],
     ['Feedback', 'Quero deixar um feedback'],
     ['Finalização', 'Obrigado, era isso']
   ];
-  const icones = { 'Saudação':'👋','Produtos':'🍔','Preços':'💰','Entrega':'🛵','Pagamento':'💳','Horário':'🕕','Endereço':'📍','Feedback':'⭐','Finalização':'✅' };
+  const icones = { 'Saudação':'👋','Produtos':'🍔','Preços':'💰','Entrega':'🛵','Pagamento':'💳','Horário':'🕕','Endereço':'📍','Site':'🌐','Feedback':'⭐','Finalização':'✅' };
 
+  // ---------------------------------------------------------------
+  // NORMALIZAÇÃO E DETECÇÃO
+  // ---------------------------------------------------------------
   const chat = document.getElementById('chatMessages');
   const typing = document.getElementById('typing');
   const input = document.getElementById('messageInput');
 
-  const normalizar = t => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  // minúsculas, sem acento, sem pontuação e com letras repetidas reduzidas ("oiii" -> "oi")
+  const normalizar = t => t
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/(.)\1+/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+
   const escapar = t => t.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const getTime = () => new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
+  // distância de Levenshtein (tolera erros de digitação em palavras maiores)
+  function lev(a, b) {
+    const m = a.length, n = b.length;
+    if (!m) return n; if (!n) return m;
+    let prev = Array.from({ length: n + 1 }, (_, j) => j);
+    for (let i = 1; i <= m; i++) {
+      const cur = [i];
+      for (let j = 1; j <= n; j++) {
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      }
+      prev = cur;
+    }
+    return prev[n];
+  }
+
+  // palavras-chave já normalizadas (sem duplicatas)
+  const intencoes = intencoesBrutas.map(([nome, palavras]) => ({
+    nome,
+    palavras: [...new Set(palavras.map(normalizar).filter(Boolean))]
+  }));
+
+  function detectar(texto) {
+    const t = normalizar(texto);
+    if (!t) return ['padrao'];
+    const padded = ' ' + t + ' ';
+    const tokens = t.split(' ');
+    const achadas = [];
+
+    for (const { nome, palavras } of intencoes) {
+      let score = 0;
+      for (const p of palavras) {
+        if (padded.includes(' ' + p + ' ')) {
+          score += p.split(' ').length;                       // frase inteira vale mais
+        } else if (!p.includes(' ') && p.length >= 5) {        // erro de digitação
+          const tol = p.length >= 8 ? 2 : 1;
+          if (tokens.some(tk => tk.length >= 4 && Math.abs(tk.length - p.length) <= tol && lev(tk, p) <= tol)) {
+            score += 0.8;
+          }
+        }
+      }
+      if (score > 0) achadas.push({ nome, score });
+    }
+
+    if (!achadas.length) return ['padrao'];
+
+    // se tem algo específico, ignora as intents sociais (ex.: "oi, qual o horário?")
+    const especificas = achadas.filter(a => !SOCIAIS.includes(a.nome));
+    const lista = especificas.length ? especificas : achadas;
+
+    lista.sort((a, b) => b.score - a.score || prioridade.indexOf(a.nome) - prioridade.indexOf(b.nome));
+
+    // responde até 2 assuntos de uma vez (ex.: "preço e entrega")
+    const top = lista[0].score;
+    return lista.filter(a => a.score >= top * 0.5).slice(0, 2).map(a => a.nome);
+  }
+
+  // ---------------------------------------------------------------
+  // CHAT
+  // ---------------------------------------------------------------
   function addMessage(html, type) {
     const m = document.createElement('div');
     m.className = 'message ' + type;
@@ -195,21 +425,13 @@
     chat.scrollTop = chat.scrollHeight;
   }
 
-  function detectar(texto) {
-    const t = ' ' + normalizar(texto).replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ') + ' ';
-    for (const [nome, palavras] of intencoes) {
-      // palavra inteira: evita "oi" dentro de "moido", por exemplo
-      if (palavras.some(p => t.includes(' ' + p + ' ') || (p.length > 4 && t.includes(p)))) return nome;
-    }
-    return 'padrao';
-  }
-
   function responder(texto) {
     typing.style.display = 'block';
     chat.scrollTop = chat.scrollHeight;
     setTimeout(() => {
       typing.style.display = 'none';
-      addMessage(respostas[detectar(texto)], 'bot');
+      const html = detectar(texto).map(n => respostas[n]()).join('<br><br>');
+      addMessage(html, 'bot');
     }, 900);
   }
 
@@ -236,7 +458,11 @@
   });
 
   // Mensagem inicial
-  addMessage('Olá! 👋<br><br>Bem-vindo(a) à <strong>The Skibideria</strong>.<br><br>' + respostas.saudacao, 'bot');
+  addMessage(
+    'Olá! 👋<br><br>Bem-vindo(a) à <strong>The Skibideria</strong>.<br><br>' + respostas.saudacao() +
+    '<br><br>💡 Dica: no nosso site a experiência é bem melhor! ' + link,
+    'bot'
+  );
 </script>
 
 </body>
